@@ -2,14 +2,13 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { API_BASE } from '../api'
 
-const API_URL = `${API_BASE}/api/quiz`
-
 export default function Quiz() {
   const [quizzes, setQuizzes] = useState([])
   const [current, setCurrent] = useState(0)
   const [phase, setPhase] = useState('loading')
   const [error, setError] = useState(null)
   const [name, setName] = useState('')
+  const [easy, setEasy] = useState(false)
   const [timeLimit, setTimeLimit] = useState(120)
   const [remaining, setRemaining] = useState(null)
   const [startTime, setStartTime] = useState(null)
@@ -21,22 +20,18 @@ export default function Quiz() {
   const submittedRef = useRef(false)
 
   useEffect(() => {
-    fetch(API_URL)
+    fetch(`${API_BASE}/api/quiz${easy ? '?easy=true' : ''}`)
       .then(res => res.json())
       .then(data => { setQuizzes(data); setPhase('ready') })
       .catch(() => setError('문제를 불러오지 못했습니다.'))
-  }, [])
+  }, [easy])
 
-  // 카운트다운 타이머
   useEffect(() => {
     if (phase !== 'quiz') return
     setRemaining(timeLimit)
     const interval = setInterval(() => {
       setRemaining(r => {
-        if (r <= 1) {
-          clearInterval(interval)
-          return 0
-        }
+        if (r <= 1) { clearInterval(interval); return 0 }
         return r - 1
       })
     }, 1000)
@@ -62,12 +57,11 @@ export default function Quiz() {
     fetch(`${API_BASE}/api/quiz/score`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.trim(), score, total: quizzes.length, elapsed: sec, details })
+      body: JSON.stringify({ name: name.trim(), score, total: quizzes.length, elapsed: sec, easy, details })
     }).catch(() => {})
     setPhase('done')
-  }, [startTime, quizzes, name])
+  }, [startTime, quizzes, name, easy])
 
-  // 타임아웃 시 자동 제출
   useEffect(() => {
     if (phase === 'quiz' && remaining === 0 && remaining !== null) {
       submitScore(answersRef.current)
@@ -77,9 +71,7 @@ export default function Quiz() {
   const handleAnswer = useCallback((val) => {
     if (lockRef.current) return
     lockRef.current = true
-
     answersRef.current = { ...answersRef.current, [current]: val }
-
     const isLast = current === quizzes.length - 1
     if (isLast) {
       submitScore(answersRef.current)
@@ -92,7 +84,6 @@ export default function Quiz() {
       }, 50)
       return
     }
-
     setTimeout(() => { lockRef.current = false }, 300)
   }, [current, quizzes.length, submitScore])
 
@@ -101,8 +92,15 @@ export default function Quiz() {
 
   const startQuiz = () => {
     submittedRef.current = false
+    answersRef.current = {}
+    setCurrent(0)
     setStartTime(Date.now())
     setPhase('quiz')
+  }
+
+  const changeEasy = (val) => {
+    setEasy(val)
+    setPhase('loading')
   }
 
   if (phase === 'ready') return (
@@ -116,6 +114,13 @@ export default function Quiz() {
         onChange={e => setName(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter' && name.trim()) startQuiz() }}
       />
+      <div className="difficulty-setting">
+        <label>난이도</label>
+        <div className="difficulty-controls">
+          <button className={`btn difficulty-btn ${easy ? 'primary' : ''}`} onClick={() => changeEasy(true)}>쉬움</button>
+          <button className={`btn difficulty-btn ${!easy ? 'primary' : ''}`} onClick={() => changeEasy(false)}>보통</button>
+        </div>
+      </div>
       <div className="time-setting">
         <label>제한시간</label>
         <div className="time-controls">
@@ -151,6 +156,37 @@ export default function Quiz() {
   const timerSec = remaining ?? timeLimit
   const timerColor = timerSec <= 10 ? '#dc2626' : timerSec <= 30 ? '#f59e0b' : '#4f46e5'
 
+  const renderQuiz = () => {
+    // 객관식
+    if (quiz.type === 2) return (
+      <div className={`options${quiz.answers.some(o => o.description.length > 10) ? ' vertical' : ''}`}>
+        {quiz.answers.map(opt => (
+          <button key={opt.num} className="option" onClick={() => handleAnswer(opt.description)}>
+            {opt.description}
+          </button>
+        ))}
+      </div>
+    )
+    // O/X
+    if (quiz.type === 3) return (
+      <div className="options ox-options">
+        <button className="option ox-btn" onClick={() => handleAnswer('O')}>⭕ O</button>
+        <button className="option ox-btn" onClick={() => handleAnswer('X')}>❌ X</button>
+      </div>
+    )
+    // 주관식
+    return (
+      <div className="judge-zone" onClick={e => {
+        const rect = e.currentTarget.getBoundingClientRect()
+        const x = (e.clientX - rect.left) / rect.width
+        const val = x > 0.66 ? quiz.correctAnswer : x < 0.33 ? '__wrong__' : '__pass__'
+        handleAnswer(val)
+      }}>
+        <p className="judge-hint">답변을 말해주세요</p>
+      </div>
+    )
+  }
+
   return (
     <div className="container">
       <div className="timer-bar">
@@ -167,28 +203,8 @@ export default function Quiz() {
 
       <div className="quiz-card">
         {transitioning ? null : <>
-        <h2 className="question">Q{current + 1}. {quiz.description}</h2>
-
-        {quiz.type === 2 ? (
-          <div className={`options${quiz.answers.some(o => o.description.length > 10) ? ' vertical' : ''}`}>
-            {quiz.answers.map(opt => (
-              <button
-                key={opt.num}
-                className="option"
-                onClick={() => handleAnswer(opt.description)}
-              >{opt.description}</button>
-            ))}
-          </div>
-        ) : (
-          <div className="judge-zone" onClick={e => {
-            const rect = e.currentTarget.getBoundingClientRect()
-            const x = (e.clientX - rect.left) / rect.width
-            const val = x > 0.66 ? quiz.correctAnswer : x < 0.33 ? '__wrong__' : '__pass__'
-            handleAnswer(val)
-          }}>
-            <p className="judge-hint">답변을 말해주세요</p>
-          </div>
-        )}
+          <h2 className="question">Q{current + 1}. {quiz.description}</h2>
+          {renderQuiz()}
         </>}
       </div>
 
