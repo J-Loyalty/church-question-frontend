@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { API_BASE } from '../api'
 
 export default function Ranking() {
   const [rankings, setRankings] = useState([])
@@ -7,7 +8,7 @@ export default function Ranking() {
   const [expanded, setExpanded] = useState(null)
 
   useEffect(() => {
-    fetch('/api/quiz/ranking')
+    fetch(`${API_BASE}/api/quiz/ranking`)
       .then(res => res.json())
       .then(data => { setRankings(data); setLoading(false) })
       .catch(() => setLoading(false))

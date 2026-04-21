@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
+import { API_BASE } from '../api'
 
-const API_URL = '/api/quiz'
+const API_URL = `${API_BASE}/api/quiz`
 
 export default function Quiz() {
   const [quizzes, setQuizzes] = useState([])
@@ -58,7 +59,7 @@ export default function Quiz() {
       }
     })
     const score = details.filter(d => d.correct).length
-    fetch('/api/quiz/score', {
+    fetch(`${API_BASE}/api/quiz/score`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: name.trim(), score, total: quizzes.length, elapsed: sec, details })

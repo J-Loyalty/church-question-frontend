@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { API_BASE } from '../api'
 
 export default function Answers() {
   const [quizzes, setQuizzes] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/quiz')
+    fetch(`${API_BASE}/api/quiz`)
       .then(res => res.json())
       .then(data => { setQuizzes(data); setLoading(false) })
       .catch(() => setLoading(false))
