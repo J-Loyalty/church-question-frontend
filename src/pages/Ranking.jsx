@@ -15,7 +15,11 @@ export default function Ranking() {
   }, [])
 
   const formatTime = (s) => s != null ? `${Math.floor(s / 60)}분 ${s % 60}초` : '-'
-  const formatDate = (dt) => dt ? new Date(dt + '+09:00').toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) : '-'
+  const formatDate = (dt) => {
+    if (!dt) return '-'
+    const d = new Date(dt)
+    return `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+  }
 
   if (loading) return <div className="container"><p>불러오는 중...</p></div>
 
