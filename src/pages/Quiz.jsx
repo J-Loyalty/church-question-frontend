@@ -132,6 +132,7 @@ export default function Quiz() {
       <button className="btn primary" disabled={!name.trim()} onClick={startQuiz}>시작하기</button>
       <div className="nav-links">
         <Link to="/ranking">랭킹</Link>
+        <Link to="/study">학습</Link>
       </div>
     </div>
   )
