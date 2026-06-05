@@ -8,8 +8,7 @@ export default function Quiz() {
   const [phase, setPhase] = useState('loading')
   const [error, setError] = useState(null)
   const [name, setName] = useState('')
-  const [easy, setEasy] = useState(false)
-  const [timeLimit, setTimeLimit] = useState(120)
+  const [timeLimit, setTimeLimit] = useState(90)
   const [remaining, setRemaining] = useState(null)
   const [startTime, setStartTime] = useState(null)
   const [elapsed, setElapsed] = useState(0)
@@ -20,11 +19,11 @@ export default function Quiz() {
   const submittedRef = useRef(false)
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/quiz${easy ? '?easy=true' : ''}`)
+    fetch(`${API_BASE}/api/quiz`)
       .then(res => res.json())
       .then(data => { setQuizzes(data); setPhase('ready') })
       .catch(() => setError('문제를 불러오지 못했습니다.'))
-  }, [easy])
+  }, [])
 
   useEffect(() => {
     if (phase !== 'quiz') return
@@ -57,10 +56,10 @@ export default function Quiz() {
     fetch(`${API_BASE}/api/quiz/score`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.trim(), score, total: quizzes.length, elapsed: sec, easy, details })
+      body: JSON.stringify({ name: name.trim(), score, total: quizzes.length, elapsed: sec, details })
     }).catch(() => {})
     setPhase('done')
-  }, [startTime, quizzes, name, easy])
+  }, [startTime, quizzes, name])
 
   useEffect(() => {
     if (phase === 'quiz' && remaining === 0 && remaining !== null) {
@@ -98,11 +97,6 @@ export default function Quiz() {
     setPhase('quiz')
   }
 
-  const changeEasy = (val) => {
-    setEasy(val)
-    setPhase('loading')
-  }
-
   if (phase === 'ready') return (
     <div className="container ready">
       <h1>📝 퀴즈</h1>
@@ -114,13 +108,6 @@ export default function Quiz() {
         onChange={e => setName(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter' && name.trim()) startQuiz() }}
       />
-      <div className="difficulty-setting">
-        <label>난이도</label>
-        <div className="difficulty-controls">
-          <button className={`btn difficulty-btn ${easy ? 'primary' : ''}`} onClick={() => changeEasy(true)}>쉬움</button>
-          <button className={`btn difficulty-btn ${!easy ? 'primary' : ''}`} onClick={() => changeEasy(false)}>보통</button>
-        </div>
-      </div>
       <div className="time-setting">
         <label>제한시간</label>
         <div className="time-controls">
