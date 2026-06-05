@@ -32,8 +32,7 @@ export default function Ranking() {
                 <span className="ranking-rank">{i + 1}</span>
                 <span className="ranking-name">{r.name}</span>
                 <span className="ranking-score">{r.score} / {r.total}</span>
-                <span className="ranking-time">{formatTime(r.elapsed)}</span>
-                <span className="ranking-date">{formatDate(r.finishedAt)}</span>
+                <span className="ranking-time">{formatTime(r.elapsed)}<br/><small className="ranking-date">{formatDate(r.finishedAt)}</small></span>
                 <span className="ranking-toggle">{expanded === i ? '▲' : '▼'}</span>
               </div>
               {expanded === i && r.details && (

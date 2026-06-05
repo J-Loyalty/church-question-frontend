@@ -199,8 +199,8 @@ a.btn { text-decoration: none; display: inline-block; text-align: center; }
 .ranking-rank { font-weight: 700; font-size: 18px; min-width: 28px; text-align: center; }
 .ranking-name { flex: 1; font-weight: 500; }
 .ranking-score { color: #4f46e5; font-weight: 600; }
-.ranking-time { color: #888; font-size: 13px; min-width: 70px; text-align: right; }
-.ranking-date { color: #888; font-size: 12px; min-width: 130px; text-align: right; }
+.ranking-time { color: #888; font-size: 13px; min-width: 70px; text-align: right; line-height: 1.4; }
+.ranking-date { color: #aaa; font-size: 11px; }
 .ranking-toggle { color: #aaa; font-size: 12px; }
 .ranking-details { padding: 0 16px 14px; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid #f0f0f0; padding-top: 12px; }
 
