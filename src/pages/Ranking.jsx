@@ -15,6 +15,7 @@ export default function Ranking() {
   }, [])
 
   const formatTime = (s) => s != null ? `${Math.floor(s / 60)}분 ${s % 60}초` : '-'
+  const formatDate = (dt) => dt ? new Date(dt).toLocaleString('ko-KR') : '-'
 
   if (loading) return <div className="container"><p>불러오는 중...</p></div>
 
@@ -32,6 +33,7 @@ export default function Ranking() {
                 <span className="ranking-name">{r.name}</span>
                 <span className="ranking-score">{r.score} / {r.total}</span>
                 <span className="ranking-time">{formatTime(r.elapsed)}</span>
+                <span className="ranking-date">{formatDate(r.finishedAt)}</span>
                 <span className="ranking-toggle">{expanded === i ? '▲' : '▼'}</span>
               </div>
               {expanded === i && r.details && (

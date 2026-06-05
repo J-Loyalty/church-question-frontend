@@ -179,10 +179,11 @@ export default function Quiz() {
       <div className="judge-zone" onClick={e => {
         const rect = e.currentTarget.getBoundingClientRect()
         const x = (e.clientX - rect.left) / rect.width
-        const val = x > 0.66 ? quiz.correctAnswer : x < 0.33 ? '__wrong__' : '__pass__'
+        const val = x > 0.5 ? quiz.correctAnswer : '__pass__'
         handleAnswer(val)
       }}>
-        <p className="judge-hint">답변을 말해주세요</p>
+        <span className="judge-label center">⏭ 패스</span>
+        <span className="judge-label right">✅ 정답</span>
       </div>
     )
   }
