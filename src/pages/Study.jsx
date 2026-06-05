@@ -108,8 +108,6 @@ export default function Study() {
 
   return (
     <div className="container">
-      <button className="btn back-btn" onClick={() => setMode('chapters')}>← 장 선택</button>
-
       <div className="study-progress">
         <span>{current + 1} / {questions.length}</span>
         <div className="progress">
@@ -148,6 +146,7 @@ export default function Study() {
 
       <div className="nav-buttons">
         <button className="btn" disabled={current === 0} onClick={prev}>◀ 이전</button>
+        <button className="btn" onClick={() => setMode('chapters')}>📚 장 선택</button>
         <button className="btn primary" disabled={current === questions.length - 1} onClick={next}>다음 ▶</button>
       </div>
     </div>

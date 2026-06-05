@@ -264,3 +264,4 @@ a.btn { text-decoration: none; display: inline-block; text-align: center; }
 
 .btn.danger.active { box-shadow: 0 0 0 3px #fca5a5; }
 .btn.success.active { box-shadow: 0 0 0 3px #86efac; }
+
