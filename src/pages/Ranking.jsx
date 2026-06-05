@@ -15,7 +15,7 @@ export default function Ranking() {
   }, [])
 
   const formatTime = (s) => s != null ? `${Math.floor(s / 60)}분 ${s % 60}초` : '-'
-  const formatDate = (dt) => dt ? new Date(dt).toLocaleString('ko-KR') : '-'
+  const formatDate = (dt) => dt ? new Date(dt + '+09:00').toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) : '-'
 
   if (loading) return <div className="container"><p>불러오는 중...</p></div>
 
